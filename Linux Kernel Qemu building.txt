@@ -1,0 +1,90 @@
+
+Linux Kernel Debugging – Qemu arm
+=================================
+step:1 Install the Cross Compilers, utilities, etc.
+# sudo apt update
+# sudo apt install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi libncurses5-dev build-essential bison flex libssl-dev bc
+# sudo apt install gcc-arm-linux-gnueabi g++-arm-linux-gnueabi
+# sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+# sudo apt-get install gcc-arm-linux-gnueabihf
+# sudo apt-get install gcc-arm-linux-gnueabi
+
+step:2 Downloading the Kernel and extract
+
+www.kernel.org
+
+# tar -xvzf linux-5.15.112.tar.gz
+
+# cd linux-5.15.112/
+
+step:-3 copy configuration file
+
+# cp arch/arm/configs/vexpress_defconfig .config
+
+step:-4 configure kernel
+
+# make menuconfig ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+
+step:5 Build kernel
+
+# make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+
+step:6 Build kernel modules
+
+# make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- modules
+
+step:7 Boot kernel image with GUI
+qemu-system-arm -M vexpress-a9 -m 512M -dtb linux-5.10.112/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -kernel linux-5.10.112/arch/arm/boot/zImage -initrd rootfs.img.gz -append "root=/dev/ram console=ttyAMA0 rdinit=/linuxrc"
+qemu-system-arm -M vexpress-a9 -m 512M -dtb linux-5.10.112/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -kernel linux-5.10.112/arch/arm/boot/zImage -initrd rootfs.img.gz -append "root=/dev/ram rdinit=/linuxrc"
+
+
+Setup Minimal Rootfs using Busybox
+====================================
+Download Busybox Image
+
+# tar -xvjf busybox-1.33.1.tar.bz2
+
+# cd busybox-1.33.1/
+
+ Configure Busybox
+
+$ sudo make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- defconfig
+$ sudo make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- menuconfig
+
+<Enable static linking>
+settings->build options->build static option->
+
+Build Busybox
+=============
+
+$ sudo make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf-
+$ sudo make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- install
+
+==>Setup Rootfs
+
+# cd ..
+
+# mkdir rootfs
+
+# cd rootfs
+
+# sudo cp -rf ../busybox-1.33.1/_install/* .
+
+# cd ..
+
+# sudo tar xvzf rootfs_base.tar.gz
+
+# cd rootfs
+
+# sudo cp -rf ../rootfs_base/* .
+
+# find . | cpio -o --format=newc > ../rootfs.img
+
+# cd ..
+# gzip -c rootfs.img > rootfs.img.gz
+
+# qemu-system-arm -M vexpress-a9 -m 512M -dtb kernel-qemu-build/linux-5.10.213/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -kernel kernel-qemu-build/linux-5.10.213/arch/arm/boot/zImage -initrd rootfs.img.gz -append "root=/dev/mem rdinit=/sbin/init serial=ttyAMA0"
+
+# qemu-system-arm -M vexpress-a9 -m 512M -dtb kernel-qemu-build/linux-5.10.213/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -kernel kernel-qemu-build/linux-5.10.213/arch/arm/boot/zImage -initrd rootfs.img.gz -append "console=ttyS0 nokaslr root=/dev/ram rdinit=/linuxrc"
+
+# qemu-system-arm -M vexpress-a9 -m 512M -dtb kernel-qemu-build/linux-5.10.213/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -kernel kernel-qemu-build/linux-5.10.213/arch/arm/boot/zImage -append "root=/dev/ram console=ttyAMA0 rdinit=/init"
