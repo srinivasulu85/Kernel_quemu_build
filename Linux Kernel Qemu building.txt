@@ -35,7 +35,7 @@ step:6 Build kernel modules
 
 step:7 Boot kernel image with GUI
 qemu-system-arm -M vexpress-a9 -m 512M -dtb linux-5.10.112/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -kernel linux-5.10.112/arch/arm/boot/zImage -initrd rootfs.img.gz -append "root=/dev/ram console=ttyAMA0 rdinit=/linuxrc"
-qemu-system-arm -M vexpress-a9 -m 512M -dtb linux-5.10.112/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -kernel linux-5.10.112/arch/arm/boot/zImage -initrd rootfs.img.gz -append "root=/dev/ram rdinit=/linuxrc"
+#qemu-system-arm -M vexpress-a9 -m 512M -dtb kernel-qemu-build/linux-5.10.213/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -kernel kernel-qemu-build/linux-5.10.213/arch/arm/boot/zImage -initrd rootfs.img.gz -append "root=/dev/mem rdinit=/sbin/init serial=ttyAMA0"
 
 
 Setup Minimal Rootfs using Busybox
@@ -85,6 +85,3 @@ $ sudo make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- install
 
 # qemu-system-arm -M vexpress-a9 -m 512M -dtb kernel-qemu-build/linux-5.10.213/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -nographic -kernel kernel-qemu-build/linux-5.10.213/arch/arm/boot/zImage -initrd rootfs.img.gz -append "root=/dev/mem rdinit=/sbin/init serial=ttyAMA0"
 
-# qemu-system-arm -M vexpress-a9 -m 512M -dtb kernel-qemu-build/linux-5.10.213/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -kernel kernel-qemu-build/linux-5.10.213/arch/arm/boot/zImage -initrd rootfs.img.gz -append "console=ttyS0 nokaslr root=/dev/ram rdinit=/linuxrc"
-
-# qemu-system-arm -M vexpress-a9 -m 512M -dtb kernel-qemu-build/linux-5.10.213/arch/arm/boot/dts/vexpress-v2p-ca9.dtb -kernel kernel-qemu-build/linux-5.10.213/arch/arm/boot/zImage -append "root=/dev/ram console=ttyAMA0 rdinit=/init"
